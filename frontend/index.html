@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TownReport — Submit a Report</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="logo.jpeg" type="image/jpeg">
+</head>
+<body>
+
+<!-- ── Header ─────────────────────────────────── -->
+<header class="app-header">
+  <svg width="22" height="22" fill="none" viewBox="0 0 24 24">
+    <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke="#fff" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M9 22V12h6v10" stroke="#fff" stroke-width="2"/>
+  </svg>
+  <div class="logo">Town<span>Report</span></div>
+  <nav class="header-nav">
+    <a href="admin.html">Admin Dashboard →</a>
+  </nav>
+</header>
+
+<!-- ── Main Form ───────────────────────────────── -->
+<main class="page">
+  <div class="card">
+    <h1 class="card-title">Report a Service Issue</h1>
+    <p class="card-sub">
+      Our AI will automatically classify your issue and assign a priority. 
+      Town staff will be notified immediately for urgent matters.
+    </p>
+
+    <form id="reportForm" novalidate>
+
+      <!-- Title -->
+      <div class="form-group">
+        <label for="title">Issue Title <span class="required">*</span></label>
+        <input
+          type="text"
+          id="title"
+          name="title"
+          placeholder="e.g. Burst water pipe on Main Street"
+          maxlength="120"
+          required
+        />
+      </div>
+
+      <!-- Description -->
+      <div class="form-group">
+        <label for="description">Description <span class="required">*</span></label>
+        <textarea
+          id="description"
+          name="description"
+          placeholder="Describe the problem in detail — what you see, how long it's been happening, how many people it affects..."
+          maxlength="1000"
+          required
+        ></textarea>
+        <p class="hint">The more detail you provide, the better our AI can classify and prioritize your issue.</p>
+      </div>
+
+      <!-- Location -->
+      <div class="form-group">
+        <label for="location">Location <span class="required">*</span></label>
+        <input
+          type="text"
+          id="location"
+          name="location"
+          placeholder="e.g. Corner of Oak Ave & 3rd Street, near the school"
+          required
+        />
+      </div>
+
+      <!-- Image upload (optional) -->
+      <div class="form-group">
+        <label for="image">Photo (optional)</label>
+        <input type="file" id="image" name="image" accept="image/*" />
+        <p class="hint">Max 5MB. JPG, PNG, or WEBP.</p>
+      </div>
+
+      <!-- Submit button -->
+      <button type="submit" class="btn btn-primary btn-full" id="submitBtn">
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24">
+          <path d="M22 2L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <path d="M22 2L15 22l-4-9-9-4 20-7z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+        </svg>
+        Submit Report
+      </button>
+
+    </form>
+
+    <!-- AI Result — shown after successful submission -->
+    <div class="ai-result" id="aiResult">
+      <p class="ai-result-title">🤖 AI Analysis</p>
+      <div class="ai-result-row">
+        <strong>Category</strong>
+        <span id="aiCategory" class="badge"></span>
+      </div>
+      <div class="ai-result-row">
+        <strong>Priority</strong>
+        <span id="aiPriority" class="badge"></span>
+      </div>
+      <p class="ai-reasoning" id="aiReasoning"></p>
+    </div>
+
+  </div>
+
+  <!-- Small footer note -->
+  <p style="text-align:center; color: var(--muted); font-size:0.8rem; margin-top:1rem;">
+    Your report is stored securely. Reference ID will be shown after submission.
+  </p>
+</main>
+
+<script src="submit.js"></script>
+</body>
+</html>

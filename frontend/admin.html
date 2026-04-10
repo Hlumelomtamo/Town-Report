@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TownReport — Admin Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* ── Dashboard-specific styles ──────────────── */
+
+    /* Stats row */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.1rem 1.25rem;
+      box-shadow: var(--shadow);
+    }
+
+    .stat-value {
+      font-family: 'Sora', sans-serif;
+      font-size: 2rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 0.25rem;
+    }
+
+    /* Filter bar */
+    .filter-bar {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.25rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow);
+    }
+
+    .filter-bar select {
+      width: auto;
+      min-width: 140px;
+      padding: 0.5rem 0.75rem;
+    }
+
+    .filter-bar label { margin-bottom: 0; font-size: 0.85rem; }
+
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    /* Reports table */
+    .table-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+    }
+
+    thead th {
+      text-align: left;
+      padding: 0.9rem 1rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background 0.1s;
+    }
+
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: #f8fafc; }
+
+    td {
+      padding: 0.85rem 1rem;
+      vertical-align: top;
+    }
+
+    .report-title { font-weight: 500; }
+    .report-location { color: var(--muted); font-size: 0.8rem; margin-top: 0.2rem; }
+
+    /* Status select in table */
+    .status-select {
+      padding: 0.25rem 0.5rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      border: 1px solid var(--border);
+      cursor: pointer;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--muted);
+    }
+
+    .empty-state svg { margin-bottom: 0.75rem; opacity: 0.3; }
+
+    /* Dashboard header row */
+    .dash-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .dash-header h1 {
+      font-family: 'Sora', sans-serif;
+      font-size: 1.35rem;
+      font-weight: 700;
+    }
+
+    .dash-header small {
+      display: block;
+      color: var(--muted);
+      font-size: 0.82rem;
+      margin-top: 0.1rem;
+    }
+
+    @media (max-width: 600px) {
+      .filter-bar { flex-direction: column; align-items: flex-start; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Header ─────────────────────────────────── -->
+<header class="app-header">
+  <svg width="22" height="22" fill="none" viewBox="0 0 24 24">
+    <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke="#fff" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M9 22V12h6v10" stroke="#fff" stroke-width="2"/>
+  </svg>
+  <div class="logo">Town<span>Report</span> — <span>Admin</span></div>
+  <nav class="header-nav">
+    <a href="index.html">← Submit Report</a>
+  </nav>
+</header>
+
+<!-- ── Dashboard ──────────────────────────────── -->
+<main class="page wide">
+
+  <!-- Title + Refresh -->
+  <div class="dash-header">
+    <div>
+      <h1>Reports Dashboard</h1>
+      <small id="lastUpdated">Loading reports...</small>
+    </div>
+    <button class="btn btn-primary" onclick="loadReports()">
+      <svg width="15" height="15" fill="none" viewBox="0 0 24 24">
+        <path d="M23 4v6h-6M1 20v-6h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      Refresh
+    </button>
+  </div>
+
+  <!-- Stats cards -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-value" id="statTotal">–</div>
+      <div class="stat-label">Total Reports</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" style="color:var(--high)" id="statHigh">–</div>
+      <div class="stat-label">High Priority</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" style="color:var(--accent)" id="statOpen">–</div>
+      <div class="stat-label">Open</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" style="color:var(--low)" id="statResolved">–</div>
+      <div class="stat-label">Resolved</div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filter-bar">
+    <div class="filter-group">
+      <label for="filterCategory">Category</label>
+      <select id="filterCategory" onchange="loadReports()">
+        <option value="">All Categories</option>
+        <option>Water</option>
+        <option>Electricity</option>
+        <option>Roads</option>
+        <option>Waste</option>
+        <option>Other</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label for="filterPriority">Priority</label>
+      <select id="filterPriority" onchange="loadReports()">
+        <option value="">All Priorities</option>
+        <option>High</option>
+        <option>Medium</option>
+        <option>Low</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label for="filterStatus">Status</label>
+      <select id="filterStatus" onchange="loadReports()">
+        <option value="">All Statuses</option>
+        <option>Open</option>
+        <option>In Progress</option>
+        <option>Resolved</option>
+      </select>
+    </div>
+
+    <div class="filter-group" style="margin-left:auto">
+      <button class="btn" style="background:#f1f5f9;color:var(--text)" onclick="clearFilters()">
+        Clear Filters
+      </button>
+    </div>
+  </div>
+
+  <!-- Reports Table -->
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Report</th>
+          <th>Category</th>
+          <th>Priority</th>
+          <th>Status</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody id="reportsTableBody">
+        <!-- Rows injected by admin.js -->
+      </tbody>
+    </table>
+
+    <!-- Empty state shown when no reports match -->
+    <div class="empty-state" id="emptyState" style="display:none">
+      <svg width="48" height="48" fill="none" viewBox="0 0 24 24">
+        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <p>No reports found for the selected filters.</p>
+    </div>
+  </div>
+
+</main>
+
+<script src="admin.js"></script>
+</body>
+</html>
